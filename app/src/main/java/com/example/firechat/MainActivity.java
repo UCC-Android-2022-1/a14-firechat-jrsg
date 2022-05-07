@@ -19,21 +19,23 @@ public class MainActivity extends AppCompatActivity {
 
     private MensajeAdapter adapter;
 
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference myRef = null;
-
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        database = FirebaseDatabase.getInstance("https://firechat-3b3e6-default-rtdb.firebaseio.com/");
+        myRef = database.getReference("chat");
+
         rvMensajes      = findViewById(R.id.rvMensajes);
         bEnviar         = findViewById(R.id.bEnviar);
         bEnviarImagen   = findViewById(R.id.ibEnviar);
         etMensaje       = findViewById(R.id.etMensaje);
 
-        myRef = database.getReference("https://firechat-3b3e6-default-rtdb.firebaseio.com/");
+
 
         adapter = new MensajeAdapter(this);
         rvMensajes.setAdapter(adapter);
@@ -58,6 +60,6 @@ public class MainActivity extends AppCompatActivity {
         m.setNombre( "rsanchez" );
         m.setFechaHora( System.currentTimeMillis() );
 
-        myRef.setValue(m);
+        myRef.push().setValue( m );
     }
 }
