@@ -1,5 +1,7 @@
 package com.example.firechat;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,6 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -19,9 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     private MensajeAdapter adapter;
 
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    FirebaseDatabase database = null;
     DatabaseReference myRef = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
         bEnviarImagen   = findViewById(R.id.ibEnviar);
         etMensaje       = findViewById(R.id.etMensaje);
 
-        myRef = database.getReference("https://firechat-3b3e6-default-rtdb.firebaseio.com/");
+        database = FirebaseDatabase.getInstance("https://firechat-3b3e6-default-rtdb.firebaseio.com/");
+        myRef = database.getReference("chat");
 
         adapter = new MensajeAdapter(this);
         rvMensajes.setAdapter(adapter);
@@ -47,6 +52,43 @@ public class MainActivity extends AppCompatActivity {
                 enviarMensaje();
             }
         });
+
+        myRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Mensaje mensaje = dataSnapshot.getValue(Mensaje.class);
+                adapter.add(mensaje); //envia a pantalla
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+
+                rvMensajes.scrollToPosition( adapter.getItemCount() - 1);
+            }
+        });
     }
 
     private void enviarMensaje() {
@@ -58,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         m.setNombre( "rsanchez" );
         m.setFechaHora( System.currentTimeMillis() );
 
-        myRef.setValue(m);
+        myRef.push().setValue(m);
+
+        etMensaje.setText("");
     }
 }

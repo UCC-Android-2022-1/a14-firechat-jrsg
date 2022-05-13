@@ -46,6 +46,8 @@ public class MensajeAdapter extends RecyclerView.Adapter<MensajeHolder> {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("d MMM, hh:mm a", new Locale( "ES"));
 
         holder.getTvFechaHora().setText( simpleDateFormat.format( new Timestamp(fechaHora))  );
+
+        holder.getTvMensaje().setText( mensaje.getCuerpo() );
     }
 
     @Override
