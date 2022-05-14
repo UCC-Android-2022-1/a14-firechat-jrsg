@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,6 +50,14 @@ public class MensajeAdapter extends RecyclerView.Adapter<MensajeHolder> {
         holder.getTvFechaHora().setText( simpleDateFormat.format( new Timestamp(fechaHora))  );
 
         holder.getTvMensaje().setText( mensaje.getCuerpo() );
+
+        if(mensaje.getImagen() != null){
+            Picasso.get().load( mensaje.getImagen() ).into( holder.getIvMensaje() );
+            holder.getIvMensaje().setVisibility( View.VISIBLE );
+        }else{
+            holder.getIvMensaje().setImageResource(0);
+            holder.getIvMensaje().setVisibility( View.GONE );
+        }
     }
 
     @Override
